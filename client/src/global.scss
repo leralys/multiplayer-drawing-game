@@ -1,0 +1,7 @@
+$bigScreens: 425px; //mobile
+
+@mixin bigScreens {
+  @media (min-width: #{$bigScreens}) {
+    @content;
+  }
+}
