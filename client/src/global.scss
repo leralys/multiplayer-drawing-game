@@ -1,7 +1,12 @@
-$bigScreens: 425px; //mobile
+$mainFont: "Mulish";
+
+$mainColor: #20b2aa;
+$lightGreyColor: #f2f2f2;
+
+$xs: 425px;
 
 @mixin bigScreens {
-  @media (min-width: #{$bigScreens}) {
+  @media (min-width: #{$xs}) {
     @content;
   }
 }

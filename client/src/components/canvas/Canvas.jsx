@@ -1,5 +1,5 @@
+import { socket } from '../../services/socketService';
 import { useEffect, useRef, useState } from 'react';
-
 import './canvas.scss';
 
 const colors = [
@@ -12,7 +12,7 @@ const colors = [
 
 const Canvas = () => {
     const [isDrawing, setIsDrawing] = useState(false);
-    const [canvasSize, setCanvasSize] = useState({ width: 300, height: 500 });
+    const [canvasSize, setCanvasSize] = useState({ width: 300, height: 400 });
     const [selectedColor, setSelectedColor] = useState(colors[0]);
     const [position, setPosition] = useState({ x: undefined, y: undefined });
     const canvasRef = useRef(null);
@@ -34,17 +34,8 @@ const Canvas = () => {
     }, [selectedColor]);
 
     // mousedown || touchstart
-    const startDrawing = ({ nativeEvent }) => {
-        //mobile
-        if (nativeEvent.touches) {
-            setPosition({ x: nativeEvent.touches[0].clientX, y: nativeEvent.touches[0].clientY });
-        }
-        //desktop
-        else {
-            setPosition({ x: nativeEvent.offsetX, y: nativeEvent.offsetY });
-        }
+    const startDrawing = (e) => {
         contextRef.current.beginPath();
-        contextRef.current.moveTo(position.x, position.y);
         setIsDrawing(true);
     };
     // mouseup && mouseleave || touchend && touchcancel
@@ -54,24 +45,34 @@ const Canvas = () => {
         setIsDrawing(false);
     };
     // mousemove || touchmove
-    const draw = ({ nativeEvent }) => {
+    const draw = (e) => {
         if (!isDrawing) {
             return;
         }
         //mobile
-        if (nativeEvent.touches) {
-            setPosition({ x: nativeEvent.touches[0].clientX, y: nativeEvent.touches[0].clientY });
+        if (e.nativeEvent.touches) {
+            const rect = e.target.getBoundingClientRect();
+            const x = e.targetTouches[0].pageX - rect.left;
+            const y = e.targetTouches[0].pageY - rect.top;
+            setPosition({ x, y });
         }
         //desktop
         else {
-            setPosition({ x: nativeEvent.offsetX, y: nativeEvent.offsetY });
+            setPosition({ x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY });
         }
+        // contextRef.current.moveTo(position.x, position.y); //doesn't work
         contextRef.current.lineTo(position.x, position.y);
         contextRef.current.stroke();
     };
     //clear canvas
     const clear = () => {
         contextRef.current.clearRect(0, 0, contextRef.current.canvas.width, contextRef.current.canvas.height);
+    }
+    const send = () => {
+        socket.emit('clientToClient', 'hello from client to all clients');
+    }
+    const pass = () => {
+        console.log('pass logic')
     }
     return (
         <div className='canvas-container'>
@@ -102,7 +103,8 @@ const Canvas = () => {
                     }
                 </div>
                 <button onClick={clear}>Clear</button>
-                <button>Send</button>
+                <button onClick={pass}>Pass</button>
+                <button onClick={send}>Send</button>
             </div>
         </div>
     )
