@@ -1,0 +1,40 @@
+@import "../../global.scss";
+
+.nav {
+  width: 100%;
+  height: 120px;
+  background-color: $lightGreyColor;
+  margin-bottom: 30px;
+  display: flex;
+  flex-direction: column;
+  padding: 0 30px;
+  align-items: center;
+  justify-content: space-evenly;
+  //   border: 1px solid red;
+  .top {
+    // border: 1px solid blue;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    // flex-direction: column;
+  }
+  .info {
+    //   border: 1px solid pink;
+    display: flex;
+    justify-content: space-between;
+  }
+}
+.bottom {
+  // border: 1px solid green;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  .word-guess {
+    color: $mainColor;
+    font-weight: 800;
+    font-size: 20px;
+    margin-left: 8px;
+  }
+}
