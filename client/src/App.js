@@ -1,24 +1,25 @@
-import logo from './logo.svg';
-import './App.css';
+import { createContext, useState, useEffect } from 'react';
 
-function App() {
+import Game from './components/game/Game';
+import Welcome from './components/welcome/Welcome';
+
+import './styles.scss';
+
+export const AppContext = createContext(null);
+
+const App = () => {
+  const [username, setUsername] = useState();
+  // useEffect(() => {
+  //   socket.on('serverToClient', (msg) => {
+  //     console.log(msg);
+  //   });
+  // }, []);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <AppContext.Provider value={{ username, setUsername }}>
+      <div className="app">
+        {username ? <Game /> : <Welcome />}
+      </div>
+    </AppContext.Provider>
   );
 }
 
