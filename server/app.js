@@ -1,8 +1,9 @@
-import express from "express";
-import { createServer } from "http";
-import { Server } from "socket.io";
+import express from 'express';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
 // import cors from 'cors';
 import { config } from 'dotenv';
+import playersController from './playersController.js';
 
 const PORT = process.env.PORT || 8080;
 
@@ -18,27 +19,54 @@ const io = new Server(httpServer, {
     }
 });
 
-io.on("connection", (socket) => {
-    // console.log(socket.id);
-    io.emit('serverToClient', 'hello from the server');
-    socket.on('clientToServer', msg => {
-        console.log(msg);
+let clientNum = 0;
+
+const connected = socket => {
+    socket.on('newPlayer', data => {
+        const msg = playersController.addNewPlayer(data);
+        if (!msg.status) {
+            // username taken - notify player
+            io.to(data.socketId).emit('notifyPlayer', { msg });
+        } else {
+            //username doesn't exist - may connect
+            clientNum++;
+            // send a player to a room where only two players can be
+            let roomNo = Math.round(clientNum / 2);
+            socket.join(roomNo);
+            let turn = 0;
+            // first player in a room
+            clientNum % 2 === 1 ? turn = 1 : turn = 2;
+            // notify a player that he is connected successfully, his roomNo, and his turn
+            io.to(data.socketId).emit('notifyPlayer', { msg, roomNo, turn });
+        }
     });
-    socket.on('clientToClient', msg => {
-        socket.broadcast.emit('serverToClient', msg);
+    // when second player comes to a room, notify the first one that the game starts
+    socket.on('startNewGame', ({ roomNo, username }) => {
+        socket.to(roomNo).emit('startNewGame', { startNewGame: true });
+        //and send info about the second user the room
+        socket.to(roomNo).emit('opponentInfo', username);
     });
-    socket.on('disconnectMe', msg => {
-        console.log(msg);
+    socket.on('some event', ({ username, roomNo }) => {
+        // socket.to(roomNo).emit('getOpponent ', username);
+        roomNo && socket.to(roomNo).emit('opponentInfo', username);
+    });
+    // notify other players when leaving the room
+    socket.on('disconnecting', () => {
+        // socket.rooms is a Set which contains at least the socket ID
+        for (let room of socket.rooms) {
+            const leavingPlayer = playersController.getDisconnectingPlayer(socket.id);
+            if (leavingPlayer) {
+                io.to(room).emit('leavingPlayer', leavingPlayer.username);
+            }
+        }
     });
     socket.on('disconnect', () => {
-        console.log(socket.id + ' left');
+        // clientNum--; ???
+        playersController.deletePlayer(socket.id);
     });
-});
+}
 
-
-app.get('/', (req, res) => {
-    res.send('hello world');
-});
+io.on('connection', connected);
 
 httpServer.listen(PORT, () => {
     console.log(`listening on port ${PORT}`)
