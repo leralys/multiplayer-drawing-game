@@ -1,0 +1,65 @@
+@import "../../global.scss";
+
+.choose-and-guess {
+  width: 300px;
+  height: 300px;
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+  align-items: center;
+  border-radius: 5px;
+  background-color: white;
+
+  @include bigScreens {
+    width: 400px;
+    height: 300px;
+  }
+
+  h3 {
+    text-align: center;
+    font-weight: 600;
+    margin: 40px 20px;
+    font-size: 24px;
+  }
+  ul {
+    font-size: 18px;
+    width: 100%;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+
+    li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      span {
+        &:first-of-type {
+          text-transform: capitalize;
+          width: 60px;
+          color: $mainColor;
+        }
+        &:last-of-type {
+          font-weight: 600;
+          color: $additionalColor;
+        }
+      }
+
+      button {
+        font-size: 18px;
+        justify-self: center;
+        min-width: 125px;
+        padding: 7px 15px;
+        background-color: $mainColor;
+        border: none;
+        border-radius: 3px;
+        color: white;
+        cursor: pointer;
+
+        &:focus {
+          background-color: $additionalColor;
+        }
+      }
+    }
+  }
+}

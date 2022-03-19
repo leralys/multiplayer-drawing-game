@@ -46,8 +46,8 @@ const connected = socket => {
         //and send info about the second user the room
         socket.to(roomNo).emit('opponentInfo', username);
     });
-    socket.on('some event', ({ username, roomNo }) => {
-        // socket.to(roomNo).emit('getOpponent ', username);
+    socket.on('userInfo', ({ username, roomNo }) => {
+        // after the first player sends his roomNo and username, send the other his username
         roomNo && socket.to(roomNo).emit('opponentInfo', username);
     });
     // notify other players when leaving the room

@@ -1,17 +1,10 @@
 import { useContext, useEffect, useState } from 'react';
-import toast, { Toaster } from 'react-hot-toast';
 import { AppContext } from '../../App';
-
+import { notifyError, notifyPaint } from '../../utilities/toastNotifyFunc';
 import './nav.scss';
 
-const notify = (text) => {
-    toast.error(text, {
-        duration: 2000,
-        id: 'endGame'
-    });
-}
 
-const Nav = (props) => {
+const Nav = ({ selectedWord, timer }) => {
     const { username, setUsername } = useContext(AppContext).user;
     const [opponent, setOpponent] = useState('...');
     const socket = useContext(AppContext).socket;
@@ -19,6 +12,7 @@ const Nav = (props) => {
     useEffect(() => {
         // get opponent
         socket.on('opponentInfo', opponent => {
+            notifyPaint(`You are playing now with ${opponent}`);
             setOpponent(opponent);
         });
     }, [socket]);
@@ -26,7 +20,7 @@ const Nav = (props) => {
     useEffect(() => {
         // notify other player when leaving
         socket.on('leavingPlayer', leavingPlayer => {
-            notify(`${leavingPlayer} has left`);
+            notifyError(`${leavingPlayer} has left`);
             setUsername(undefined);
             // end game logic
         });
@@ -39,16 +33,17 @@ const Nav = (props) => {
                 <div className='bottom'>...</div>
             </div>
             <div className='center'>
-                <div className='top'>Time left: ...</div>
+                <div className='top'>Time left: {timer}</div>
                 <div className='bottom'>
-                    You word is <span className='word-guess'>...</span>
+                    You word is <span className='word-guess'>
+                        {selectedWord === '' ? ' ...' : selectedWord}
+                    </span>
                 </div>
             </div>
             <div className='right'>
                 <div className='top'>{opponent}</div>
                 <div className='bottom'>...</div>
             </div>
-            <Toaster />
         </nav>
     )
 }

@@ -1,11 +1,9 @@
 import { createContext, useState, useEffect } from 'react';
-
 import { io } from 'socket.io-client';
-import { serverUrl } from './services/socket';
-
+import { Toaster } from 'react-hot-toast';
+import { serverUrl } from './utilities/socket';
 import Game from './components/game/Game';
 import Welcome from './components/welcome/Welcome';
-
 import './styles.scss';
 
 export const AppContext = createContext(null);
@@ -33,6 +31,7 @@ const App = () => {
       <div className='app'>
         {username ? <Game /> : <Welcome />}
       </div>
+      <Toaster />
     </AppContext.Provider >
   );
 }

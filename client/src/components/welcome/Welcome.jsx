@@ -1,16 +1,8 @@
 import { useState, useContext } from 'react';
-import toast, { Toaster } from 'react-hot-toast';
 import { AppContext } from '../../App';
-
+import { notifySorry } from '../../utilities/toastNotifyFunc';
 import './welcome.scss';
 
-const notify = (text) => {
-    toast.error(text, {
-        duration: 1000,
-        icon: '😞',
-        id: 'error'
-    });
-}
 
 const Welcome = () => {
     const { setUsername, setTurn, setRoomNo } = useContext(AppContext).user;
@@ -26,7 +18,7 @@ const Welcome = () => {
         socket.on('notifyPlayer', data => {
             if (!data.msg.status) {
                 // error, may not enter - username taken
-                notify(data.msg.text);
+                notifySorry(data.msg.text);
                 // setUsername('');
             } else {
                 // success, may enter - username does not exist
@@ -48,7 +40,6 @@ const Welcome = () => {
                     onChange={e => changeInput(e.target.value)} />
                 <button>Enter</button>
             </form>
-            <Toaster />
         </div>
     )
 }
