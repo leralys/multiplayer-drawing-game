@@ -1,4 +1,4 @@
-import { socket } from '../../services/socketService';
+// import { socket } from '../../services/socket.js';
 import { useEffect, useRef, useState } from 'react';
 import './canvas.scss';
 
@@ -8,11 +8,11 @@ const colors = [
     'green',
     'yellow',
     'blue'
-]
+];
 
 const Canvas = () => {
     const [isDrawing, setIsDrawing] = useState(false);
-    const [canvasSize, setCanvasSize] = useState({ width: 300, height: 400 });
+    const [canvasSize, setCanvasSize] = useState({ width: 300, height: 300 });
     const [selectedColor, setSelectedColor] = useState(colors[0]);
     const [position, setPosition] = useState({ x: undefined, y: undefined });
     const canvasRef = useRef(null);
@@ -20,16 +20,16 @@ const Canvas = () => {
     const contextRef = useRef(null);
 
     useEffect(() => {
-        // need to move to separate function maybe 
+        // need to move to separate function maybe ?
         const canvas = canvasRef.current;
         if (window.innerWidth > 425) {
-            setCanvasSize({ width: 400, height: 600 });
+            setCanvasSize({ width: 400, height: 300 });
         }
         const context = canvas.getContext('2d');
         // initial setting for the context
         context.lineCap = 'round'; //round endings for the lines
-        context.strokeStyle = selectedColor; //color of the pen
-        context.lineWidth = 5;
+        context.strokeStyle = selectedColor; //initial color of the pen
+        window.innerWidth > 425 ? context.lineWidth = 6 : context.lineWidth = 3; //pen width
         contextRef.current = context;
     }, [selectedColor]);
 
@@ -60,7 +60,6 @@ const Canvas = () => {
         else {
             setPosition({ x: e.nativeEvent.offsetX, y: e.nativeEvent.offsetY });
         }
-        // contextRef.current.moveTo(position.x, position.y); //doesn't work
         contextRef.current.lineTo(position.x, position.y);
         contextRef.current.stroke();
     };
@@ -69,10 +68,7 @@ const Canvas = () => {
         contextRef.current.clearRect(0, 0, contextRef.current.canvas.width, contextRef.current.canvas.height);
     }
     const send = () => {
-        socket.emit('clientToClient', 'hello from client to all clients');
-    }
-    const pass = () => {
-        console.log('pass logic')
+        console.log('send img logic');
     }
     return (
         <div className='canvas-container'>
@@ -103,7 +99,6 @@ const Canvas = () => {
                     }
                 </div>
                 <button onClick={clear}>Clear</button>
-                <button onClick={pass}>Pass</button>
                 <button onClick={send}>Send</button>
             </div>
         </div>
