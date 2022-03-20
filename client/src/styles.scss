@@ -5,6 +5,11 @@
   box-sizing: border-box;
   font-family: $mainFont, sans-serif;
 }
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+}
 .app {
   width: 100vw;
   max-height: 80vh;

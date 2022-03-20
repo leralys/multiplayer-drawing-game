@@ -53,11 +53,11 @@ const Canvas = (props) => {
             let myImage = new Image();
             myImage.src = guessTheWord.imgData;
             myImage.onload = () => {
-                contextRef.current.drawImage(myImage, 0, 0);
+                contextRef.current.drawImage(myImage, 0, 0, canvasSize.width, canvasSize.height);
             }
             SetTimerStart(true);
         }
-    }, [guessTheWord, SetTimerStart]);
+    }, [guessTheWord, SetTimerStart, canvasSize]);
 
     // mousedown || touchstart
     const startDrawing = (e) => {
@@ -77,6 +77,7 @@ const Canvas = (props) => {
         }
         //mobile
         if (e.nativeEvent.touches) {
+            // e.preventDefault();
             const rect = e.target.getBoundingClientRect();
             const x = e.targetTouches[0].pageX - rect.left;
             const y = e.targetTouches[0].pageY - rect.top;
