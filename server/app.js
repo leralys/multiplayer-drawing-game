@@ -43,14 +43,27 @@ const connected = socket => {
     // when second player comes to a room, notify the first one that the game starts
     socket.on('startNewGame', ({ roomNo, username }) => {
         socket.to(roomNo).emit('startNewGame', { startNewGame: true });
-        //and send info about the second user the room
+        //and send info about the second player the room
         socket.to(roomNo).emit('opponentInfo', username);
     });
+    // player (first one) sends his roomNo and username to the opponent (second player)
     socket.on('userInfo', ({ username, roomNo }) => {
-        // after the first player sends his roomNo and username, send the other his username
         roomNo && socket.to(roomNo).emit('opponentInfo', username);
     });
-    // notify other players when leaving the room
+    // player sends image + info about it, send it to the other player in the room
+    socket.on('image', ({ dataURL, roomNo, selectedWord }) => {
+        socket.to(roomNo).emit('guessTheWord', { dataURL, selectedWord });
+    });
+    // update opponents score
+    socket.on('updateScore', ({ score, roomNo }) => {
+        socket.to(roomNo).emit('opponentScore', score);
+    })
+    // leaveGame button was clicked 
+    socket.on('leaveGame', ({ username, roomNo }) => {
+        socket.to(roomNo).emit('leavingPlayer', username);
+        playersController.deletePlayer(socket.id);
+    });
+    // notify other player when leaving the room
     socket.on('disconnecting', () => {
         // socket.rooms is a Set which contains at least the socket ID
         for (let room of socket.rooms) {
