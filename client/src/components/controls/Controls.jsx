@@ -82,13 +82,14 @@ const Controls = (props) => {
         <div className='controls'>
             <form
                 onSubmit={handleSubmit}
-                className={(guessTheWord.word === '' ? 'hidden' : '')}
-            >
+                className={(guessTheWord.word === '' ? 'hidden' : '')}>
                 <input
                     type='text'
                     onChange={e => changeInput(e.target.value)}
                     placeholder='guess the word' />
-                <img src={ready} alt='' />
+                <img
+                    src={ready} alt=''
+                    onClick={handleSubmit} />
             </form>
             <img
                 onClick={leaveGame}

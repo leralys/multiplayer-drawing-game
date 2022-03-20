@@ -1,14 +1,14 @@
 import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
-// import cors from 'cors';
+import cors from 'cors';
 import { config } from 'dotenv';
 import playersController from './playersController.js';
 
 const PORT = process.env.PORT || 8080;
 
 config();
-// app.use(cors());
+app.use(cors());
 
 const app = express();
 const httpServer = createServer(app);
@@ -74,7 +74,6 @@ const connected = socket => {
         }
     });
     socket.on('disconnect', () => {
-        // clientNum--; ???
         playersController.deletePlayer(socket.id);
     });
 }

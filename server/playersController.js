@@ -24,14 +24,10 @@ class PlayersController {
         } else {
             msg = { status: false, text: 'username taken' };
         }
-        // console.log('all players:', players);
-        // console.log('num players:', players.length);
         return msg;
     }
     deletePlayer(socketId) {
-        // console.log('num players before:', players.length);
         players.splice(findIndx(socketId), 1);
-        // console.log('num players after:', players.length);
     }
     getDisconnectingPlayer(socketId) {
         if (findUserById(socketId)) {

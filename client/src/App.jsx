@@ -14,7 +14,9 @@ const App = () => {
   const [turn, setTurn] = useState();
   const [socket, setSocket] = useState(null);
   useEffect(() => {
-    setSocket(io(serverUrl));
+    setSocket(io(serverUrl), {
+      withCredentials: true
+    });
   }, []);
   return (
     <AppContext.Provider value={{
