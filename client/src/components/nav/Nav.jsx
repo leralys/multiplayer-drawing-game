@@ -1,10 +1,10 @@
 import { useContext, useEffect, useState } from 'react';
 import { AppContext } from '../../App';
-import { notifyError, notifyPaint } from '../../utilities/toastNotifyFunc';
+import { notifyError } from '../../utilities/toastNotifyFunc';
 import './nav.scss';
 
 
-const Nav = ({ selectedWord, timer }) => {
+const Nav = ({ selectedWord, timer, score, opponentScore }) => {
     const { username, setUsername } = useContext(AppContext).user;
     const [opponent, setOpponent] = useState('...');
     const socket = useContext(AppContext).socket;
@@ -12,9 +12,11 @@ const Nav = ({ selectedWord, timer }) => {
     useEffect(() => {
         // get opponent
         socket.on('opponentInfo', opponent => {
-            notifyPaint(`You are playing now with ${opponent}`);
             setOpponent(opponent);
         });
+        return () => {
+            socket.removeListener('opponentInfo');
+        }
     }, [socket]);
 
     useEffect(() => {
@@ -24,25 +26,28 @@ const Nav = ({ selectedWord, timer }) => {
             setUsername(undefined);
             // end game logic
         });
+        return () => {
+            socket.removeAllListeners();
+        }
     }, [socket, setUsername]);
 
     return (
         <nav className='nav'>
             <div className='left'>
                 <div className='top'>{username}</div>
-                <div className='bottom'>...</div>
+                <div className='bottom'>{score}</div>
             </div>
             <div className='center'>
                 <div className='top'>Time left: {timer}</div>
                 <div className='bottom'>
                     You word is <span className='word-guess'>
-                        {selectedWord === '' ? ' ...' : selectedWord}
+                        {selectedWord.word === '' ? ' ...' : selectedWord.word}
                     </span>
                 </div>
             </div>
             <div className='right'>
                 <div className='top'>{opponent}</div>
-                <div className='bottom'>...</div>
+                <div className='bottom'>{opponentScore}</div>
             </div>
         </nav>
     )

@@ -1,6 +1,6 @@
 @import "../../global.scss";
 
-.choose-and-guess {
+.choose-word {
   width: 300px;
   height: 300px;
   display: flex;
@@ -55,10 +55,6 @@
         border-radius: 3px;
         color: white;
         cursor: pointer;
-
-        &:focus {
-          background-color: $additionalColor;
-        }
       }
     }
   }

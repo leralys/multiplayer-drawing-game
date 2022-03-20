@@ -3,9 +3,7 @@ import { AppContext } from '../../App';
 
 import { generateSlug } from 'random-word-slugs';
 
-// import Canvas from '../canvas/Canvas';
-import ChooseAndGuess from '../chooseAndGuess/ChooseAndGuess';
-import Controls from '../controls/Controls';
+import ChooseAndDraw from '../chooseAndDraw/ChooseAndDraw';
 import Nav from '../nav/Nav';
 import WaitingRoom from '../waitingRoom/WaitingRoom';
 
@@ -26,20 +24,29 @@ const generateWord = category => {
     return word;
 }
 
-// const [score, setScore] = useState('');
-// const [opponent, setOpponent] = useState('');
 
 const Game = () => {
     const { turn, username, roomNo } = useContext(AppContext).user;
     const socket = useContext(AppContext).socket;
     const [startGame, setStartGame] = useState(false);
+    const [timerStart, SetTimerStart] = useState(false);
+    const [timer, setTimer] = useState('...');
     const [words, setWords] = useState({
         easy: { word: generateWord(easyCategory), points: 1 },
         medium: { word: generateWord(mediumCategory), points: 3 },
         hard: { word: generateWord(hardCategory), points: 5 }
     });
-    const [selectedWord, setSelectedWord] = useState('');
-    const [timer, setTimer] = useState('...');
+    const [selectedWord, setSelectedWord] = useState({
+        word: '',
+        points: 0
+    });
+    const [guessTheWord, setGuessTheWord] = useState({
+        imgData: '',
+        word: '',
+        points: 0
+    });
+    const [score, setScore] = useState(0);
+    const [opponentScore, setOpponentScore] = useState(0);
 
     useEffect(() => {
         // if player comes second - the game starts
@@ -55,26 +62,35 @@ const Game = () => {
                     socket.emit('userInfo', { username, roomNo });
                 }
             });
+            return () => {
+                socket.removeListener('startNewGame');
+            }
         }
     }, [turn, setStartGame, roomNo, socket, username]);
     return (
         <div className='game'>
             <Nav selectedWord={selectedWord}
                 timer={timer}
+                score={score}
+                opponentScore={opponentScore}
             />
             {!startGame || (startGame && turn === 2)
-                ? <WaitingRoom startGame={startGame} />
-                : <ChooseAndGuess
+                ? <WaitingRoom
+                    startGame={startGame}
+                    setGuessTheWord={setGuessTheWord} />
+                : <ChooseAndDraw
                     words={words}
                     selectedWord={selectedWord}
                     setSelectedWord={setSelectedWord}
                     timer={timer}
-                    setTimer={setTimer} />
+                    setTimer={setTimer}
+                    timerStart={timerStart}
+                    SetTimerStart={SetTimerStart}
+                    guessTheWord={guessTheWord}
+                    setGuessTheWord={setGuessTheWord}
+                    setScore={setScore}
+                />
             }
-            {/* {selectedWord !== '' &&
-                <Canvas />
-            } */}
-            <Controls />
         </div>
     )
 }

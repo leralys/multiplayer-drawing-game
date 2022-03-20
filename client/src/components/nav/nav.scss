@@ -6,7 +6,7 @@
   background-color: $lightGreyColor;
   margin-bottom: 30px;
   display: flex;
-  padding: 15px 30px;
+  padding: 15px 24px;
   align-items: stretch;
   justify-content: space-between;
   border-bottom: 4px solid $mainColor;
@@ -20,13 +20,19 @@
       font-size: 20px;
       font-weight: 600;
     }
+    .top {
+      word-break: break-all;
+    }
   }
 
   .left {
     align-items: flex-start;
+    flex-basis: 20%;
   }
   .center {
+    flex-basis: 60%;
     align-items: center;
+    text-align: center;
     .word-guess {
       color: $mainColor;
       font-weight: 800;
@@ -34,5 +40,6 @@
   }
   .right {
     align-items: flex-end;
+    flex-basis: 20%;
   }
 }

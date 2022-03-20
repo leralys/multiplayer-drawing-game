@@ -15,14 +15,6 @@ export const notifyError = text => {
     });
 }
 
-export const notifyPaint = text => {
-    toast.success(text, {
-        duration: 1000,
-        icon: '🧑‍🎨',
-        id: 'paint'
-    });
-};
-
 export const notifySuccess = text => {
     toast.success(text, {
         duration: 1000,

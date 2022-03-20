@@ -4,41 +4,34 @@
   width: 100%;
   display: flex;
   align-items: center;
-  justify-content: space-around;
+  justify-content: center;
   margin-top: 30px;
 
   @include bigScreens {
     width: 50vw;
     margin: 30px auto 0px;
   }
+  form {
+    display: flex;
+    height: 50px;
+    align-items: center;
+    justify-content: center;
+    margin-right: 20px;
+    &.hidden {
+      visibility: hidden;
+    }
 
-  button {
-    justify-self: flex-start;
-    padding: 7px 15px;
-    margin-left: 10px;
-    background-color: $mainColor;
-    border: none;
-    border-radius: 3px;
-    color: white;
-    cursor: pointer;
-    visibility: hidden;
-
-    &:hover {
-      transform: scale(1.1);
+    input {
+      width: 200px;
+      height: 30px;
+      padding: 20px;
     }
   }
 
   img {
     width: 30px;
     height: 30px;
-    margin-right: 10px;
+    margin-left: 10px;
     cursor: pointer;
-    &:hover {
-      transform: scale(1.1);
-    }
-    &#ready,
-    &#play {
-      visibility: hidden;
-    }
   }
 }

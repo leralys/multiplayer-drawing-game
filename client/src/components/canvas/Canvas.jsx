@@ -1,5 +1,6 @@
-// import { socket } from '../../services/socket.js';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useContext } from 'react';
+import { AppContext } from '../../App';
+import Controls from '../controls/Controls';
 import './canvas.scss';
 
 const colors = [
@@ -10,17 +11,29 @@ const colors = [
     'blue'
 ];
 
-const Canvas = () => {
+const Canvas = (props) => {
+    const {
+        selectedWord,
+        setSelectedWord,
+        timerStart,
+        SetTimerStart,
+        timer,
+        setTimer,
+        guessTheWord,
+        setGuessTheWord,
+        setScore
+    } = props;
+
+    const { roomNo, setTurn, turn } = useContext(AppContext).user;
+    const socket = useContext(AppContext).socket;
     const [isDrawing, setIsDrawing] = useState(false);
     const [canvasSize, setCanvasSize] = useState({ width: 300, height: 300 });
     const [selectedColor, setSelectedColor] = useState(colors[0]);
     const [position, setPosition] = useState({ x: undefined, y: undefined });
     const canvasRef = useRef(null);
-    // store 2d context in a ref
     const contextRef = useRef(null);
 
     useEffect(() => {
-        // need to move to separate function maybe ?
         const canvas = canvasRef.current;
         if (window.innerWidth > 425) {
             setCanvasSize({ width: 400, height: 300 });
@@ -32,6 +45,18 @@ const Canvas = () => {
         window.innerWidth > 425 ? context.lineWidth = 6 : context.lineWidth = 3; //pen width
         contextRef.current = context;
     }, [selectedColor]);
+
+    useEffect(() => {
+        const { word } = guessTheWord;
+        if (word !== '') {
+            let myImage = new Image();
+            myImage.src = guessTheWord.imgData;
+            myImage.onload = () => {
+                contextRef.current.drawImage(myImage, 0, 0);
+            }
+            SetTimerStart(true);
+        }
+    }, [guessTheWord, SetTimerStart]);
 
     // mousedown || touchstart
     const startDrawing = (e) => {
@@ -68,11 +93,16 @@ const Canvas = () => {
         contextRef.current.clearRect(0, 0, contextRef.current.canvas.width, contextRef.current.canvas.height);
     }
     const send = () => {
-        console.log('send img logic');
+        const dataURL = canvasRef.current.toDataURL();
+        socket.emit('image', { dataURL, roomNo, selectedWord });
+        SetTimerStart(false);
+        setTimer('...');
+        setSelectedWord({ word: '' });
+        setTurn(2);
     }
     return (
-        <div className='canvas-container'>
-            <canvas className='canvas'
+        <div className={'canvas-container' + (!timerStart ? ' deactivated' : '')}>
+            <canvas className={'canvas' + (!timerStart ? ' deactivated' : '')}
                 ref={canvasRef}
                 width={canvasSize.width} height={canvasSize.height}
                 onMouseDown={startDrawing}
@@ -84,7 +114,7 @@ const Canvas = () => {
                 onMouseMove={draw}
                 onTouchMove={draw}
             />
-            <div className='buttons-container'
+            <div className={'buttons-container' + (guessTheWord.word !== '' ? ' hidden' : '')}
                 style={{ width: canvasSize.width }}>
                 <div className='colors-container'>
                     {
@@ -98,9 +128,25 @@ const Canvas = () => {
                         })
                     }
                 </div>
-                <button onClick={clear}>Clear</button>
-                <button onClick={send}>Send</button>
+                <button id='clear'
+                    className={(!timerStart ? 'deactivated' : '')}
+                    onClick={clear}>
+                    Clear
+                </button>
+                <button id='send'
+                    className={(!timerStart ? 'active' : '')}
+                    onClick={send}>
+                    Send
+                </button>
             </div>
+            <Controls
+                guessTheWord={guessTheWord}
+                setGuessTheWord={setGuessTheWord}
+                setScore={setScore}
+                timerStart={timerStart}
+                SetTimerStart={SetTimerStart}
+                timer={timer}
+                setTimer={setTimer} />
         </div>
     )
 }

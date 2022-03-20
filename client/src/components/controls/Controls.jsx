@@ -1,24 +1,88 @@
+import { useContext, useState, useEffect } from 'react';
+import { AppContext } from '../../App';
+import { notifySuccess } from '../../utilities/toastNotifyFunc';
 import ready from '../../assets/readyIcon.png';
-import play from '../../assets/playIcon.png';
 import leave from '../../assets/logoutIcon.png';
 
 import './controls.scss';
 
+const Controls = (props) => {
+    const {
+        guessTheWord,
+        setGuessTheWord,
+        setScore,
+        timerStart,
+        SetTimerStart,
+        timer,
+        setTimer
+    } = props;
+    const { socket } = useContext(AppContext);
+    const { roomNo, username, setUsername, setRoomNo, setTurn } = useContext(AppContext).user;
+    const [input, changeInput] = useState('');
 
-const Controls = () => {
-    const leaveGame = () => {
-        // console.log({ username, socketId: socket.id });
-        console.log('leave game logic');
+    useEffect(() => {
+        if (timerStart && guessTheWord.word !== '') {
+            let seconds = 10;
+            setTimer(seconds);
+            const interval = setInterval(() => {
+                if (seconds === 1) {
+                    clearInterval(interval);
+                    SetTimerStart(false);
+                    setGuessTheWord({ word: '' });
+                }
+                seconds--;
+                setTimer(seconds);
+            }, 1000);
+            return () => {
+                clearInterval(interval);
+                SetTimerStart(false);
+                setGuessTheWord({ word: '' });
+            }
+        }
+    }, [timerStart, setTimer, SetTimerStart, guessTheWord.word, setGuessTheWord]);
+
+    useEffect(() => {
+        if (timer === 0) {
+            setTimer('...');
+        }
+    }, [timer, setTimer]);
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (guessTheWord.word === input) {
+            notifySuccess('Good job!');
+            setScore(score => Number(score) + Number(guessTheWord.points));
+            setGuessTheWord({ word: '' });
+            SetTimerStart(false);
+            setTimer('...');
+        } else {
+            console.log('no')
+        }
     }
-    const pass = () => {
-        console.log('pass logic')
+    const leaveGame = () => {
+        // notify the other player when leaving
+        socket.emit('leaveGame', { username, roomNo });
+        // reset state
+        setUsername(undefined);
+        setRoomNo(undefined);
+        setTurn(undefined);
+        // remove all socket io listeners to prevent memory leak when components unmount
+        socket.removeAllListeners();
     }
     return (
         <div className='controls'>
-            <button onClick={pass}>Pass</button>
-            <img src={ready} id={'ready'} alt='' />
-            <img src={play} id='play' alt='' />
-            <img onClick={leaveGame}
+            <form
+                onSubmit={handleSubmit}
+                className={(guessTheWord.word === '' ? 'hidden' : '')}
+            >
+                <input
+                    type='text'
+                    onChange={e => changeInput(e.target.value)}
+                    placeholder='guess the word' />
+                <img src={ready} alt='' />
+            </form>
+            <img
+                onClick={leaveGame}
                 src={leave} alt=''
             />
         </div>
