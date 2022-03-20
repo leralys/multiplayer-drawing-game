@@ -15,13 +15,14 @@ const ChooseAndDraw = (props) => {
         SetTimerStart,
         guessTheWord,
         setGuessTheWord,
+        score,
         setScore
     } = props;
     const list = Object.entries(words);
 
     useEffect(() => {
         if (timerStart) {
-            let seconds = 10;
+            let seconds = 30;
             setTimer(seconds);
             const interval = setInterval(() => {
                 if (seconds === 1) {
@@ -79,6 +80,7 @@ const ChooseAndDraw = (props) => {
                     setTimer={setTimer}
                     guessTheWord={guessTheWord}
                     setGuessTheWord={setGuessTheWord}
+                    score={score}
                     setScore={setScore} />
             }
         </>

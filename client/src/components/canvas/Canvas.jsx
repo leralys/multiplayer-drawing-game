@@ -21,10 +21,11 @@ const Canvas = (props) => {
         setTimer,
         guessTheWord,
         setGuessTheWord,
+        score,
         setScore
     } = props;
 
-    const { roomNo, setTurn, turn } = useContext(AppContext).user;
+    const { roomNo, setTurn } = useContext(AppContext).user;
     const socket = useContext(AppContext).socket;
     const [isDrawing, setIsDrawing] = useState(false);
     const [canvasSize, setCanvasSize] = useState({ width: 300, height: 300 });
@@ -142,6 +143,7 @@ const Canvas = (props) => {
             <Controls
                 guessTheWord={guessTheWord}
                 setGuessTheWord={setGuessTheWord}
+                score={score}
                 setScore={setScore}
                 timerStart={timerStart}
                 SetTimerStart={SetTimerStart}

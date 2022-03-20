@@ -73,6 +73,7 @@ const Game = () => {
                 timer={timer}
                 score={score}
                 opponentScore={opponentScore}
+                setOpponentScore={setOpponentScore}
             />
             {!startGame || (startGame && turn === 2)
                 ? <WaitingRoom
@@ -88,6 +89,7 @@ const Game = () => {
                     SetTimerStart={SetTimerStart}
                     guessTheWord={guessTheWord}
                     setGuessTheWord={setGuessTheWord}
+                    score={score}
                     setScore={setScore}
                 />
             }

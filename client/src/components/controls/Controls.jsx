@@ -10,6 +10,7 @@ const Controls = (props) => {
     const {
         guessTheWord,
         setGuessTheWord,
+        score,
         setScore,
         timerStart,
         SetTimerStart,
@@ -22,7 +23,7 @@ const Controls = (props) => {
 
     useEffect(() => {
         if (timerStart && guessTheWord.word !== '') {
-            let seconds = 10;
+            let seconds = 30;
             setTimer(seconds);
             const interval = setInterval(() => {
                 if (seconds === 1) {
@@ -47,16 +48,23 @@ const Controls = (props) => {
         }
     }, [timer, setTimer]);
 
+    // send the score to the server each time it updates so the oppponent will know 
+    useEffect(() => {
+        socket.emit('updateScore', { score, roomNo });
+        return () => {
+            socket.removeListener('updateScore');
+        }
+    }, [score]);
+
     const handleSubmit = (e) => {
         e.preventDefault();
+        // when guessed right update the score, send it to server, update state
         if (guessTheWord.word === input) {
             notifySuccess('Good job!');
-            setScore(score => Number(score) + Number(guessTheWord.points));
+            setScore(s => Number(score) + Number(guessTheWord.points));
             setGuessTheWord({ word: '' });
             SetTimerStart(false);
             setTimer('...');
-        } else {
-            console.log('no')
         }
     }
     const leaveGame = () => {
@@ -66,6 +74,7 @@ const Controls = (props) => {
         setUsername(undefined);
         setRoomNo(undefined);
         setTurn(undefined);
+        setGuessTheWord({ word: '' })
         // remove all socket io listeners to prevent memory leak when components unmount
         socket.removeAllListeners();
     }

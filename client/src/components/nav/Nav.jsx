@@ -4,7 +4,14 @@ import { notifyError } from '../../utilities/toastNotifyFunc';
 import './nav.scss';
 
 
-const Nav = ({ selectedWord, timer, score, opponentScore }) => {
+const Nav = (props) => {
+    const {
+        selectedWord,
+        timer,
+        score,
+        opponentScore,
+        setOpponentScore
+    } = props;
     const { username, setUsername } = useContext(AppContext).user;
     const [opponent, setOpponent] = useState('...');
     const socket = useContext(AppContext).socket;
@@ -14,10 +21,14 @@ const Nav = ({ selectedWord, timer, score, opponentScore }) => {
         socket.on('opponentInfo', opponent => {
             setOpponent(opponent);
         });
+        socket.on('opponentScore', opponentScore => {
+            setOpponentScore(opponentScore);
+        });
         return () => {
             socket.removeListener('opponentInfo');
+            socket.removeListener('opponentScore');
         }
-    }, [socket]);
+    }, [socket, setOpponentScore]);
 
     useEffect(() => {
         // notify other player when leaving
