@@ -8,9 +8,9 @@ import playersController from './playersController.js';
 const PORT = process.env.PORT || 8080;
 
 config();
-app.use(cors());
 
 const app = express();
+app.use(cors());
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
     cors: {
@@ -33,6 +33,8 @@ const connected = socket => {
             // send a player to a room where only two players can be
             let roomNo = Math.round(clientNum / 2);
             socket.join(roomNo);
+            // add the roomNo to players array
+            playersController.addUserRoom(data.username, roomNo);
             let turn = 0;
             // first player in a room
             clientNum % 2 === 1 ? turn = 1 : turn = 2;
@@ -58,26 +60,28 @@ const connected = socket => {
     socket.on('updateScore', ({ score, roomNo }) => {
         socket.to(roomNo).emit('opponentScore', score);
     })
-    // leaveGame button was clicked 
+    // leaveGame button was clicked - delete the other player from the room
     socket.on('leaveGame', ({ username, roomNo }) => {
         socket.to(roomNo).emit('leavingPlayer', username);
         playersController.deletePlayer(socket.id);
+        playersController.cleanTheRoom(roomNo);
     });
     // notify other player when leaving the room
     socket.on('disconnecting', () => {
         // socket.rooms is a Set which contains at least the socket ID
-        for (let room of socket.rooms) {
-            const leavingPlayer = playersController.getDisconnectingPlayer(socket.id);
-            if (leavingPlayer) {
-                io.to(room).emit('leavingPlayer', leavingPlayer.username);
-            }
+        let rooms = Array.from(socket.rooms);
+        const leavingPlayer = playersController.getDisconnectingPlayer(socket.id);
+        if (leavingPlayer && rooms.length > 1) {
+            // send the the of the user who is leaving
+            io.to(rooms[1]).emit('leavingPlayer', leavingPlayer.username);
+            // clean the room - the game must restart
+            playersController.cleanTheRoom(rooms[1]);
         }
     });
     socket.on('disconnect', () => {
         playersController.deletePlayer(socket.id);
     });
 }
-
 io.on('connection', connected);
 
 httpServer.listen(PORT, () => {

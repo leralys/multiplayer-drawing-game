@@ -77,9 +77,10 @@ const Controls = (props) => {
         setUsername(undefined);
         setRoomNo(undefined);
         setTurn(undefined);
-        setGuessTheWord({ word: '' })
+        setGuessTheWord({ word: '', imgData: '' });
         // remove all socket io listeners to prevent memory leak when components unmount
         socket.removeAllListeners();
+        window.location.reload(false);
     }
     return (
         <div className='controls'>
