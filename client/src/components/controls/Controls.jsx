@@ -1,6 +1,6 @@
 import { useContext, useState, useEffect } from 'react';
 import { AppContext } from '../../App';
-import { notifySuccess } from '../../utilities/toastNotifyFunc';
+import { notifySuccess, notifySorry } from '../../utilities/toastNotifyFunc';
 import ready from '../../assets/readyIcon.png';
 import leave from '../../assets/logoutIcon.png';
 
@@ -54,17 +54,20 @@ const Controls = (props) => {
         return () => {
             socket.removeListener('updateScore');
         }
-    }, [score]);
+    }, [score, roomNo, socket]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
         // when guessed right update the score, send it to server, update state
-        if (guessTheWord.word === input) {
+        if (guessTheWord.word === input.toLowerCase()) {
             notifySuccess('Good job!');
             setScore(s => Number(score) + Number(guessTheWord.points));
             setGuessTheWord({ word: '' });
             SetTimerStart(false);
             setTimer('...');
+        } else {
+            changeInput('');
+            notifySorry('Sorry, wrong answer');
         }
     }
     const leaveGame = () => {
@@ -85,6 +88,7 @@ const Controls = (props) => {
                 className={(guessTheWord.word === '' ? 'hidden' : '')}>
                 <input
                     type='text'
+                    value={input}
                     onChange={e => changeInput(e.target.value)}
                     placeholder='guess the word' />
                 <img
