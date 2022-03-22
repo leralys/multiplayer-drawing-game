@@ -1,5 +1,9 @@
 const players = [];
 
+
+// CALBACK FUNCTIONS
+
+
 // checks if a user is in the players array by a user name (true/false)
 const findUsername = username => {
     return players.some(p => p.username === username);
@@ -13,19 +17,25 @@ const findUserById = socketId => {
     return players.find(p => p.socketId === socketId);
 }
 
+
+// CONTROLLER METHODS
+
+
 class PlayersController {
     addNewPlayer(player) {
-        let msg = {};
+        let res = {};
         if (!findUsername(player.username)) {
             players.push(player);
 
-            console.log('new player is online now:', `username: ${player.username}, socketId: ${player.socketId}`);
+            res = { status: true, text: 'successfully connected' };
 
-            msg = { status: true, text: 'successfully connected' };
+            console.log('new player is online now:', `username: ${player.username}, socketId: ${player.socketId}`);
+            console.log(players);
         } else {
-            msg = { status: false, text: 'username taken' };
+            res = { status: false, text: 'username taken' };
+            console.log(players);
         }
-        return msg;
+        return res;
     }
     deletePlayer(socketId) {
         players.splice(findIndx(socketId), 1);

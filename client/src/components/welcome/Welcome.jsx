@@ -1,33 +1,27 @@
-import { useState, useContext } from 'react';
+import { io } from 'socket.io-client';
+import { useState, useContext, useEffect } from 'react';
 import { AppContext } from '../../App';
-import { notifySorry } from '../../utilities/toastNotifyFunc';
+// import { notifySorry } from '../../utilities/toastNotifyFunc';
+
 import './welcome.scss';
 
+const serverURL = (process.env.NODE_ENV === 'production'
+    ? process.env.REACT_APP_PRODUCTION_SERVER
+    : process.env.REACT_APP_DEVELOPMENT_SERVER);
 
 const Welcome = () => {
-    const { setUsername, setTurn, setRoomNo } = useContext(AppContext).user;
-    const { socket } = useContext(AppContext);
-    // const { setTurn } = useContext(AppContext).room;
+    const { setUsername, sestTurn, setRoomNo } = useContext(AppContext).user;
+    const { socket, setSocket } = useContext(AppContext).socket;
     const [input, changeInput] = useState('');
+    useEffect(() => {
+        setSocket(io(serverURL), {
+            autoConnect: false,
+            reconnection: false
+        });
+    }, []);
     const handleSubmit = (e) => {
         e.preventDefault();
-        // send event to the server
-        if (input === '') return;
-        socket?.emit('newPlayer', { username: input, socketId: socket.id });
-        // get event from the server
-        socket.on('notifyPlayer', data => {
-            if (!data.msg.status) {
-                // error, may not enter - username taken
-                notifySorry(data.msg.text);
-                // setUsername('');
-            } else {
-                // success, may enter - username does not exist
-                setUsername(input);
-                setRoomNo(data.roomNo);
-                setTurn(data.turn);
-                console.log(input, 'roomNo:', data.roomNo, 'turn:', data.turn);
-            }
-        });
+        console.log(input);
     }
     return (
         <div className='welcome-container'>
@@ -41,7 +35,7 @@ const Welcome = () => {
                 <button>Enter</button>
             </form>
         </div>
-    )
+    );
 }
 
 export default Welcome;

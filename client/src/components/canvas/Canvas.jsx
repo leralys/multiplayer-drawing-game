@@ -1,15 +1,9 @@
 import { useEffect, useRef, useState, useContext } from 'react';
 import { AppContext } from '../../App';
 import Controls from '../controls/Controls';
+import colors from '../../utilities/colors';
 import './canvas.scss';
 
-const colors = [
-    'black',
-    'red',
-    'green',
-    'yellow',
-    'blue'
-];
 
 const Canvas = (props) => {
     const {
@@ -28,7 +22,7 @@ const Canvas = (props) => {
     const { roomNo, setTurn } = useContext(AppContext).user;
     const socket = useContext(AppContext).socket;
     const [isDrawing, setIsDrawing] = useState(false);
-    const [canvasSize, setCanvasSize] = useState({ width: 300, height: 300 });
+    const [canvasSize, setCanvasSize] = useState({ width: window.innerWidth, height: 350 });
     const [selectedColor, setSelectedColor] = useState(colors[0]);
     const [position, setPosition] = useState({ x: undefined, y: undefined });
     const canvasRef = useRef(null);
@@ -37,7 +31,7 @@ const Canvas = (props) => {
     useEffect(() => {
         const canvas = canvasRef.current;
         if (window.innerWidth > 425) {
-            setCanvasSize({ width: 400, height: 300 });
+            setCanvasSize({ width: 425 });
         }
         const context = canvas.getContext('2d');
         // initial setting for the context
