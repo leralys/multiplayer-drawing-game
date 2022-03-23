@@ -1,29 +1,10 @@
 import { useState, useContext, useEffect } from 'react';
 import { AppContext } from '../../App';
-
-import { generateSlug } from 'random-word-slugs';
-
 import ChooseAndDraw from '../chooseAndDraw/ChooseAndDraw';
 import Nav from '../nav/Nav';
 import WaitingRoom from '../waitingRoom/WaitingRoom';
-
+import { categories, generateWord } from '../../utilities/generateWords';
 import './game.scss';
-
-
-const easyCategory = 'food';
-const mediumCategory = 'animals';
-const hardCategory = 'education';
-
-const generateWord = category => {
-    const word = generateSlug(1, {
-        partsOfSpeech: ['noun'],
-        categories: {
-            noun: [`${category}`]
-        }
-    });
-    return word;
-}
-
 
 const Game = () => {
     const { turn, username, roomNo } = useContext(AppContext).user;
@@ -32,9 +13,9 @@ const Game = () => {
     const [timerStart, SetTimerStart] = useState(false);
     const [timer, setTimer] = useState('...');
     const [words, setWords] = useState({
-        easy: { word: generateWord(easyCategory), points: 1 },
-        medium: { word: generateWord(mediumCategory), points: 3 },
-        hard: { word: generateWord(hardCategory), points: 5 }
+        easy: generateWord(categories.easy),
+        medium: generateWord(categories.medium),
+        hard: generateWord(categories.easy),
     });
     const [selectedWord, setSelectedWord] = useState({
         word: '',
@@ -67,6 +48,7 @@ const Game = () => {
             }
         }
     }, [turn, setStartGame, roomNo, socket, username]);
+
     return (
         <div className='game'>
             <Nav selectedWord={selectedWord}
@@ -81,6 +63,7 @@ const Game = () => {
                     setGuessTheWord={setGuessTheWord} />
                 : <ChooseAndDraw
                     words={words}
+                    setWords={setWords}
                     selectedWord={selectedWord}
                     setSelectedWord={setSelectedWord}
                     timer={timer}

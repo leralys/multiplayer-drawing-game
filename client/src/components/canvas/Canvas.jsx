@@ -1,15 +1,9 @@
 import { useEffect, useRef, useState, useContext } from 'react';
 import { AppContext } from '../../App';
 import Controls from '../controls/Controls';
+import { colors } from '../../utilities/colors';
 import './canvas.scss';
 
-const colors = [
-    'black',
-    'red',
-    'green',
-    'yellow',
-    'blue'
-];
 
 const Canvas = (props) => {
     const {
@@ -28,7 +22,6 @@ const Canvas = (props) => {
     const { roomNo, setTurn } = useContext(AppContext).user;
     const socket = useContext(AppContext).socket;
     const [isDrawing, setIsDrawing] = useState(false);
-    const [canvasSize, setCanvasSize] = useState({ width: 300, height: 300 });
     const [selectedColor, setSelectedColor] = useState(colors[0]);
     const [position, setPosition] = useState({ x: undefined, y: undefined });
     const canvasRef = useRef(null);
@@ -36,9 +29,6 @@ const Canvas = (props) => {
 
     useEffect(() => {
         const canvas = canvasRef.current;
-        if (window.innerWidth > 425) {
-            setCanvasSize({ width: 400, height: 300 });
-        }
         const context = canvas.getContext('2d');
         // initial setting for the context
         context.lineCap = 'round'; //round endings for the lines
@@ -48,16 +38,16 @@ const Canvas = (props) => {
     }, [selectedColor]);
 
     useEffect(() => {
-        const { word } = guessTheWord;
-        if (word !== '') {
+        const { imgData } = guessTheWord;
+        if (imgData !== '') {
             let myImage = new Image();
-            myImage.src = guessTheWord.imgData;
+            myImage.src = imgData;
             myImage.onload = () => {
-                contextRef.current.drawImage(myImage, 0, 0, canvasSize.width, canvasSize.height);
+                contextRef.current.drawImage(myImage, 0, 0);
             }
             SetTimerStart(true);
         }
-    }, [guessTheWord, SetTimerStart, canvasSize]);
+    }, [guessTheWord, SetTimerStart]);
 
     // mousedown || touchstart
     const startDrawing = (e) => {
@@ -104,9 +94,11 @@ const Canvas = (props) => {
     }
     return (
         <div className={'canvas-container' + (!timerStart ? ' deactivated' : '')}>
-            <canvas className={'canvas' + (!timerStart ? ' deactivated' : '')}
+            <canvas
+                width={300}
+                height={300}
+                className={'canvas' + (!timerStart ? ' deactivated' : '')}
                 ref={canvasRef}
-                width={canvasSize.width} height={canvasSize.height}
                 onMouseDown={startDrawing}
                 onTouchStart={startDrawing}
                 onMouseUp={finishDrawing}
@@ -116,8 +108,7 @@ const Canvas = (props) => {
                 onMouseMove={draw}
                 onTouchMove={draw}
             />
-            <div className={'buttons-container' + (guessTheWord.word !== '' ? ' hidden' : '')}
-                style={{ width: canvasSize.width }}>
+            <div className={'buttons-container' + (guessTheWord.word !== '' ? ' hidden' : '')}>
                 <div className='colors-container'>
                     {
                         colors.map(color => {

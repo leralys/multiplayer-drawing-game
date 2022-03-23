@@ -22,17 +22,16 @@
     }
   }
   .buttons-container {
-    margin-top: 5px;
-    width: inherit;
+    width: 300px;
     display: flex;
     justify-content: space-evenly;
-    align-items: center;
-
+    align-items: flex-start;
     &.hidden {
       visibility: hidden;
     }
 
     button {
+      margin-top: 10px;
       padding: 5px 15px;
       background-color: white;
       border: 1px solid black;
@@ -56,12 +55,15 @@
     }
     .colors-container {
       display: flex;
+      width: 50%;
+      flex-wrap: wrap;
       .color {
         padding: 0px;
-        margin-right: 2px;
+        margin: 8px 2px 0px;
         cursor: pointer;
-        width: 20px;
-        height: 20px;
+        width: 30px;
+        height: 30px;
+        border: 1px solid grey;
 
         &.deactivated {
           cursor: not-allowed;

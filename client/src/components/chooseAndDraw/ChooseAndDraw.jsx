@@ -1,12 +1,14 @@
 import { useEffect, useContext } from 'react';
 import { AppContext } from '../../App';
 import Canvas from '../canvas/Canvas';
+import { categories, generateWord } from '../../utilities/generateWords';
 import './chooseAndDraw.scss';
 
 const ChooseAndDraw = (props) => {
     const { turn } = useContext(AppContext).user;
     const {
         words,
+        setWords,
         selectedWord,
         setSelectedWord,
         timer,
@@ -44,6 +46,14 @@ const ChooseAndDraw = (props) => {
             setTimer('...');
         }
     }, [timer, setTimer]);
+
+    useEffect(() => {
+        setWords({
+            easy: generateWord(categories.easy),
+            medium: generateWord(categories.medium),
+            hard: generateWord(categories.easy),
+        });
+    }, [setWords])
 
     const startDraw = (e) => {
         setSelectedWord({

@@ -1,12 +1,15 @@
 import { createContext, useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
 import { Toaster } from 'react-hot-toast';
-import { serverUrl } from './utilities/socket';
 import Game from './components/game/Game';
 import Welcome from './components/welcome/Welcome';
 import './styles.scss';
 
 export const AppContext = createContext(null);
+
+const serverURL = (process.env.NODE_ENV === 'production'
+  ? process.env.REACT_APP_PRODUCTION_SERVER
+  : process.env.REACT_APP_DEVELOPMENT_SERVER);
 
 const App = () => {
   const [username, setUsername] = useState();
@@ -14,7 +17,7 @@ const App = () => {
   const [turn, setTurn] = useState();
   const [socket, setSocket] = useState(null);
   useEffect(() => {
-    setSocket(io(serverUrl), {
+    setSocket(io(serverURL), {
       withCredentials: true
     });
   }, []);
